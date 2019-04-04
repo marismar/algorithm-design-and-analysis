@@ -6,7 +6,7 @@ void MSTPRIM(Graph G, vertex r){
     vertex *PAI = malloc(G->V * sizeof(vertex *));
     for (vertex u = 0; u < G->V; u++)
         PAI[u] = -1;
-    PAI[r] = 0;
+    PAI[r] = r;
     while(1){
         vertex pai, filho;
         int minimo = INFINITO;
