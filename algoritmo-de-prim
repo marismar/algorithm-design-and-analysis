@@ -1,3 +1,7 @@
+#include "graph.h"
+
+#define INFINITO 10000
+
 void MSTPRIM(Graph G){
     vertex *PAI = malloc(G->V * sizeof(vertex *));
     for (vertex u = 0; u < G->V; u++)
