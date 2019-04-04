@@ -1,0 +1,19 @@
+void partition(int *A, int inicio, int fim){
+	int pivo = A[inicio];
+	int i = inicio +1;
+	int j = fim + 1;
+	while (1){
+        do i=i+1 while A[i]<=pivo;
+        do j=j-1 while A[j]>pivo;
+        if (i>=j) break;
+        int aux1 = A[i];
+        A[i] = A[j];
+        A[j] = aux1;
+	}
+    int aux2 = A[inicio];
+    A[inicio] = A[j];
+    A[j] = aux2;
+	}
+}
+
+void quickSort(int *A, int l, int r);
