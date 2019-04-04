@@ -1,21 +1,22 @@
-void MSTPRIM(Graph G, vertex r){
-    vertex *pai = malloc(G->V * sizeof(vertex *));
+void MSTPRIM(Graph G){
+    vertex *PAI = malloc(G->V * sizeof(vertex *));
     for (vertex u = 0; u < G->V; u++)
-        pai[u] = -1;
-    pai[r] = 0;
+        PAI[u] = -1;
+    PAI[0] = 0;
+    //PAI[r] = 0
     while(1){
-        vertex x, y;
+        vertex pai, filho;
         int minimo = INFINITO;
         for (vertex v = 0; v<G->V; ++v){
-            if (pai[v] == -1) continue;
+            if (PAI[v] == -1) continue;
             for (link a = G->adj[v]; a!=NULL; a=a->next){
-                if(pai[a->w]==-1 && minimo>a->cst){
+                if(PAI[a->w]==-1 && minimo>a->cst){
                     minimo = a->cst;
-                    x = v, y = a->w;
+                    pai = v, filho = a->w;
                 }
             }
             if (minimo == INFINITO) break;
-            pai[y] = x;
+            PAI[filho] = pai;
         }
     }
 }
