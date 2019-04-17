@@ -1,17 +1,17 @@
-#define vertex int
+#define vertex int  //Definição de um tipo inteiro para representação dos vértices
 
-typedef struct node *link;
-struct node{
-    vertex w;
-    link next;
-    int cst;    
+typedef struct node *link;  //Definição de um ponteiro do tipo node 
+struct node{    //Estrutura de uma lista encadeada para representação das lista de adjacências
+    vertex w;   //Vértice atual
+    link next;  //Próximo vértice
+    int cst;   //Custo da aresta entre w e next
 };
 
 typedef struct graph *Graph;
 struct graph {
-   int V;
-   int A;
-   link *adj;
+   int V;   //Número de vertices do grafo
+   int A;   //Número de arestas do grafo
+   link *adj;   //Listas de adjacências dos vértices
 };
 
 static link NEWnode(vertex w, link next, int cst){
@@ -28,7 +28,7 @@ Graph GRAPHinit(int V){
     G->A = 0;
     G->adj = malloc(V * sizeof(link));
     for (vertex v = 0; v < V; ++v)
-        G->adj[v] = NULL;
+        G->adj[v] = NULL;   //Define como null cada 
     return G;
 }
 
