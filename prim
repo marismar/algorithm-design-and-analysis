@@ -1,6 +1,6 @@
 #include "graph.h"  //biblioteca da definição
 
-#define INFINITO 10000
+#define INFINITO 10000  //Define uma constante com um valor maior do que qualquer aresta presente no grafo
 
 void MSTPRIM(Graph G, vertex r){
     vertex *PAI = malloc(G->V * sizeof(vertex *));  //Definição de uma lista de ponteiros para vértice
