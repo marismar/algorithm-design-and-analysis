@@ -39,8 +39,37 @@ void HVMP(grafo g, int *rota, int n_inicial){    //Heuristica de construção do
 }
 
 int *opt2(grafo g, int *rota){
-    int melhor_rota[g.n_elementos + 1];
+    int custo = calculaCusto(g, rota);
+    cout << "custo inicial :" << " ";
+    cout << custo << endl;
+    int rt_opt[g.n_elementos + 1];
+    copiaArray(rt_opt, rota, g.n_elementos);
+    for(int i = 1; i < g.n_elementos - 1; i++){
+        for (int j = i + 1; j < g.n_elementos; j++){
+            int rt_aux[g.n_elementos + 1];
+            copiaArray(rt_aux, rota, g.n_elementos);
+            flip(g.n_elementos, rota, rt_aux, i, j);
+            if (custo > calculaCusto(g, rt_aux)){
+                custo = calculaCusto(g, rt_aux);
+                copiaArray(rt_opt, rt_aux, g.n_elementos);
+            }
+        }
+    }
+    printRota(g, rt_opt);
+    cout << "custo final: " << " ";
+    cout << custo << endl;
 
+    return rt_opt; //rota aprimorada, com o custo menor que a rota inicial
+}
+
+static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2){
+    for(int a = 0; a < lim1; a++) rt_aux[a] = rota[a];
+    for(int a = lim1, b = 0; a <= lim2; a++, b++)  rt_aux[a] = rota[lim2 - b];
+    for(int a = lim2 + 1; a < n_elementos; a++) rt_aux[a] = rota[a];
+}
+
+static void copiaArray(int *destino, int *origem, int n_elementos){
+    for (int u = 0; u <= n_elementos; u++)  destino[u] = origem[u];
 }
 
 int calculaCusto(grafo g, int *rota){
@@ -84,5 +113,3 @@ void printRota(grafo g, int *rota){
     for(int u = 0; u <= g.n_elementos; u++) cout << rota[u] << " ";
     cout << endl;
 }
-
-
