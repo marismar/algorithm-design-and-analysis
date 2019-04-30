@@ -13,9 +13,14 @@ int main()
 
     int rota[g.n_elementos + 1];
     HVMP(g, rota, calculaNInicial(g, rota));
+
     printRota(g, rota);
 
-    cout << "Hello world!" << endl;
+    int a = calculaCusto(g, rota);
+
+    cout << a << endl;
+
+    opt2(g, rota);
 
     return 0;
 }
