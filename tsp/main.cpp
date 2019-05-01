@@ -40,6 +40,13 @@ int main()
     cout << "custo: " << " ";
     cout << a << endl;
     cout << "OK" << endl;
+    
+    VND(g, rota);
+
+    printRota(g, rota);
+    a = calculaCusto(g, rota);
+    cout << "custo: " << " ";
+    cout << a << endl;
 
     return 0;
 }
