@@ -13,14 +13,33 @@ int main()
 
     int rota[g.n_elementos + 1];
     HVMP(g, rota, calculaNInicial(g, rota));
-
     printRota(g, rota);
 
-    int a = calculaCusto(g, rota);
+    int *rt_teste = new int[g.n_elementos + 1];
 
+    rt_teste = opt2(g, rota);
+
+    printRota(g, rt_teste);
+    int a = calculaCusto(g, rt_teste);
+    cout << "custo: " << " ";
     cout << a << endl;
+    rt_teste = swap(g, rt_teste);
+    printRota(g, rt_teste);
+    a = calculaCusto(g, rt_teste);
+    cout << "custo: " << " ";
+    cout << a << endl;
+    rt_teste = swap(g, rt_teste);
+    printRota(g, rt_teste);
+    a = calculaCusto(g, rt_teste);
+    cout << "custo: " << " ";
+    cout << a << endl;
+    rt_teste = opt2(g, rt_teste);
 
-    opt2(g, rota);
+    printRota(g, rt_teste);
+    a = calculaCusto(g, rt_teste);
+    cout << "custo: " << " ";
+    cout << a << endl;
+    cout << "OK" << endl;
 
     return 0;
 }
