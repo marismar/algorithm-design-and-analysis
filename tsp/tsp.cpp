@@ -42,11 +42,11 @@ int *opt2(grafo g, int *rota){
     int custo = calculaCusto(g, rota);
     cout << "custo inicial :" << " ";
     cout << custo << endl;
-    int rt_opt[g.n_elementos + 1];
+    int *rt_opt = new int[g.n_elementos + 1];
     copiaArray(rt_opt, rota, g.n_elementos);
     for(int i = 1; i < g.n_elementos - 1; i++){
         for (int j = i + 1; j < g.n_elementos; j++){
-            int rt_aux[g.n_elementos + 1];
+            int *rt_aux = new int[g.n_elementos + 1];
             copiaArray(rt_aux, rota, g.n_elementos);
             flip(g.n_elementos, rota, rt_aux, i, j);
             if (custo > calculaCusto(g, rt_aux)){
@@ -64,10 +64,10 @@ int *opt2(grafo g, int *rota){
 
 int *swap(grafo g, int *rota){
     int custo = calculaCusto(g, rota);
-    int rt_swap[g.n_elementos + 1];
+    int *rt_swap = new int[g.n_elementos + 1];
     copiaArray(rt_swap, rota, g.n_elementos);
     for(int i = 1; i < g.n_elementos; i++){
-        int rt_aux[g.n_elementos + 1];
+        int *rt_aux = new int[g.n_elementos + 1];
         copiaArray(rt_aux, rota, g.n_elementos);
         for(int j = i + 1; j < g.n_elementos; j++){
             int aux = rt_aux[j];
@@ -88,7 +88,7 @@ static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2){
     for(int a = lim2 + 1; a < n_elementos; a++) rt_aux[a] = rota[a];
 }
 
-void copiaArray(int *destino, int *origem, int n_elementos){
+static void copiaArray(int *destino, int *origem, int n_elementos){
     for (int u = 0; u <= n_elementos; u++)  destino[u] = origem[u];
 }
 
