@@ -82,6 +82,27 @@ int *swap(grafo g, int *rota){
     return rt_swap;
 }
 
+int *VND(grafo g, int *rota){
+    int n_estruturas = 2, estrutura = 1;
+    int *rt_vnd = new int[g.n_elementos + 1];
+    copiaArray(rt_vnd, rota, g.n_elementos);
+
+    while(estrutura <= n_estruturas){
+        rt_vnd = (estrutura == 1 ? swap(g, rota):opt2(g, rota));
+        if(calculaCusto(g, rota) > calculaCusto(g, rt_vnd)){
+            copiaArray(rota, rt_vnd, g.n_elementos);
+            estrutura = 1;
+        } else {
+            estrutura++;
+        }
+    }
+    printRota(g, rota);
+    int a = calculaCusto(g, rota);
+    cout << "custo: " << " ";
+    cout << a << endl;
+    return rota;
+}
+
 static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2){
     for(int a = 0; a < lim1; a++) rt_aux[a] = rota[a];
     for(int a = lim1, b = 0; a <= lim2; a++, b++)  rt_aux[a] = rota[lim2 - b];
@@ -94,7 +115,7 @@ static void copiaArray(int *destino, int *origem, int n_elementos){
 
 int calculaCusto(grafo g, int *rota){
     int custo = 0;
-    for (int u = 0; u < g.n_elementos - 1; u++) custo += g.elementos[rota[u]][rota[u + 1]];
+    for (int u = 0; u < g.n_elementos; u++) custo += g.elementos[rota[u]][rota[u + 1]];
     return custo;
 }
 
