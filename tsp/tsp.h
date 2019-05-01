@@ -22,9 +22,12 @@ typedef struct grafo{
 
 /*------ FUNCOES ESSENCIAIS ------*/
 void iniciaGrafo(grafo *g, ifstream &instancia);
+//void iniciaSolucao(grafo g);
+//void atualizaSolucao(grafo g, int *rota);
 void HVMP(grafo g, int *rota, int n_inicial);
 int *opt2(grafo g, int *rota);
 int *swap(grafo g, int *rota);
+int *VND(grafo g, int *rota);
 
 
 /*------ FUNCOES AUXILIARES ------*/
