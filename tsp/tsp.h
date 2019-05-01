@@ -29,7 +29,7 @@ int *swap(grafo g, int *rota);
 
 /*------ FUNCOES AUXILIARES ------*/
 static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2);
-void copiaArray(int *destino, int *origem, int n_elementos);
+static void copiaArray(int *destino, int *origem, int n_elementos);
 int calculaCusto(grafo g, int *rota);
 int calculaNInicial(grafo g, int *rota);
 void printMatriz(grafo g);
