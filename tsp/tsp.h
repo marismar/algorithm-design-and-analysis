@@ -4,6 +4,9 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <time.h>
+#include <vector>
+#include <algorithm>
 
 #define INFINITO 9999999
 
@@ -14,24 +17,25 @@ typedef struct grafo{
     int **elementos;
 };
 
-/*typedef struct solucao{
+typedef struct elemento{
     int custo;
-    int *rota;
-};*/
+    int id;
+};
 
 
 /*------ FUNCOES ESSENCIAIS ------*/
 void iniciaGrafo(grafo *g, ifstream &instancia);
-//void iniciaSolucao(grafo g);
-//void atualizaSolucao(grafo g, int *rota);
 void HVMP(grafo g, int *rota, int n_inicial);
 int *opt2(grafo g, int *rota);
 int *swap(grafo g, int *rota);
 int *VND(grafo g, int *rota);
-
+int *GRASP(grafo g, int grasp_max, int *rota);
+static vector<int> construcao(grafo g, int alpha);
 
 /*------ FUNCOES AUXILIARES ------*/
 static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2);
+static elemento iniciaElemento(grafo g, int linha, int coluna);
+static custoMaxMin(vector<elemento> LC, int *minimo, int *maximo);
 static void copiaArray(int *destino, int *origem, int n_elementos);
 int calculaCusto(grafo g, int *rota);
 int calculaNInicial(grafo g, int *rota);
