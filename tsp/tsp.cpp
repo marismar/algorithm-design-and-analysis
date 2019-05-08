@@ -3,41 +3,6 @@
 void iniciaGrafo(grafo *g, ifstream &instancia){
     instancia >> g->n_elementos;
 
-
-    /*int i , j[100], Total, k, l, mult;
-    string text;
-
-	if (instancia.is_open() && instancia.good()){
-
-			getline(instancia, text);
-			//instancia >> text;
-			//cout<<text;
-			for (i = 0, k=0; i < text.length(); i++){
-
-    			cout << text[i] << " - " << (int)text[i] << endl;
-    			if((int)text[i]>=48  && (int)text[i]<=57){
-    				j[k]=(int)text[i]-48;
-    				cout<<"      "<<k<<" - "<<j[k]<<endl;
-    				k++;
-				}
-			}cout<<endl<<k<<endl;
-            for(i=0, Total=0, mult=0; k>0; k--, i++){
-                cout<<(j[i])<< " ";
-                for(l=0, mult=1; l<k-1; l++){
-                    mult*=10;
-                }
-                //if(mult!=0)
-                    Total+=(j[i])*(mult);
-                //else
-                //	Total+=j[i];
-
-                cout<<" -> "<<mult<<" = "<< Total<<endl;
-            }
-                        cout<<endl<<endl <<Total<< endl;
-		}
-
-    g->n_elementos = Total;*/
-
     g->elementos = new int*[g->n_elementos];
     for (int u = 0; u < g->n_elementos; u++) g->elementos[u] = new int[g->n_elementos];
 
@@ -50,163 +15,164 @@ void iniciaGrafo(grafo *g, ifstream &instancia){
     }
 }
 
-void HVMP(grafo g, int *rota, int n_inicial){    //Heuristica de construção do vizinho mais proximo
-    bool elem_adicionados[g.n_elementos];
-    for(int u = 0; u < g.n_elementos; u++) elem_adicionados[u] = false;
+vector<int> HVMP(grafo g, int n_inicial){    //Heuristica de construção do vizinho mais proximo
+    vector<int> rota;   //define uma rota
+    bool elem_adicionados[g.n_elementos];   //array para determinar se o elemento já foi adicionado a lista
+    for(int u = 0; u < g.n_elementos; u++) elem_adicionados[u] = false; //inicializa todo mundo igual a false
 
-    elem_adicionados[n_inicial] = true;
-    rota[0] = n_inicial;
+    rota.push_back((int)(n_inicial));   //adiciona o elemento inicial a lista
+    elem_adicionados[n_inicial] = true; //muda o valor do elemento inicial para true
 
     for(int i = 0; i < g.n_elementos; i++){
-        int distancia_min = INFINITO;
-        int n_proximo;
-
+        int distancia_min = INFINITO;   //define a distancia minima como infinita
+        int n_proximo = -1; //proximo elemento a ser adicionado a lista recebe valor nulo
         for(int j = 0; j < g.n_elementos; j++){
-            if((elem_adicionados[j] == false) && (distancia_min > g.elementos[rota[i]][j]) && (i != j)){  //se o elemento nao já estiver contido na rota, e for a menor distancia
-                distancia_min = g.elementos[rota[i]][j];
-                n_proximo = j;
+            if((elem_adicionados[j] == false) && (distancia_min > g.elementos[rota[i]][j]) && (i != j)){  //se o elemento nao estiver contido na rota e for a menor distancia
+                distancia_min = g.elementos[rota[i]][j];    //atualiza a distancia minima encontrada
+                n_proximo = j;  //salva o indice como o proximo elemento em potencial a ser adicionado na rota
             }
         }
-        rota[i + 1] = n_proximo;    //adiciona o proximo a rota
+        rota.push_back((int)(n_proximo));    //adiciona o proximo a rota
         elem_adicionados[n_proximo] = true; //salva o proximo como adicionado a rota
     }
-    rota[g.n_elementos] = n_inicial;    //retorna ao ponto inicial ao fim da rota
+    rota.push_back((int)(n_inicial));    //adiciona o ponto inicial ao fim da rota para fechar o ciclo hamiltoniano
+    return rota;    //retorna a rota
 }
 
-int *opt2(grafo g, int *rota){
-    int custo = calculaCusto(g, rota);
-    cout << "custo inicial :" << " ";
-    cout << custo << endl;
-    int *rt_opt = new int[g.n_elementos + 1];
-    copiaArray(rt_opt, rota, g.n_elementos);
-    for(int i = 1; i < g.n_elementos - 1; i++){
-        for (int j = i + 1; j < g.n_elementos; j++){
-            int *rt_aux = new int[g.n_elementos + 1];
-            copiaArray(rt_aux, rota, g.n_elementos);
-            flip(g.n_elementos, rota, rt_aux, i, j);
-            if (custo > calculaCusto(g, rt_aux)){
-                custo = calculaCusto(g, rt_aux);
-                copiaArray(rt_opt, rt_aux, g.n_elementos);
+vector<int> opt2(grafo g, vector<int> rota){
+    int custo_inicial = calculaCusto(g, rota);    //salva o custo da solucao inicial
+
+    vector<int> rt_opt; //define a rota que a funcao ira retornar
+    int lim1 = -1, lim2 = -1;   //valores de indice nulos
+    int menor_custo = custo_inicial; //menor custo inicializado com um valor muito grande
+    for(int i = 1; i < g.n_elementos; i++){
+        for(int j = i + 1; j < g.n_elementos; j++){
+            int custo_aux = custo_inicial - g.elementos[rota[i-1]][rota[i]] - g.elementos[rota[j]][rota[j+1]]
+                                          + g.elementos[rota[i-1]][rota[j]] + g.elementos[rota[i]][rota[j+1]];
+            if (custo_aux < menor_custo){
+                menor_custo = custo_aux;
+                lim1 = i;
+                lim2 = j;
             }
         }
     }
-    printRota(g, rt_opt);
-    cout << "custo final: " << " ";
-    cout << custo << endl;
 
+    if(lim1 == -1)  rt_opt = rota; //se nao encontrar nenhuma rota mais curta, rt_opt recebe a rota original
+    else rt_opt = flip(g, rota, rt_opt, lim1, lim2); //salva a rota mais curta em rt_opt
     return rt_opt; //rota aprimorada, com o custo menor que a rota inicial
 }
 
-int *swap(grafo g, int *rota){
-    int custo = calculaCusto(g, rota);
-    int *rt_swap = new int[g.n_elementos + 1];
-    copiaArray(rt_swap, rota, g.n_elementos);
-    for(int i = 1; i < g.n_elementos; i++){ //nao troca o valor inicial
-        int *rt_aux = new int[g.n_elementos + 1];
-        copiaArray(rt_aux, rota, g.n_elementos);
+vector<int> swap(grafo g, vector<int> rota){
+    int custo_inicial = calculaCusto(g, rota);
+    vector<int> rt_swap;
+    rt_swap = rota;
+    int indice1 = -1, indice2 = -1; //valores de indice nulos
+    int menor_custo = INFINITO; //menor custo inicializado com um valor muito grande
+    for(int i = 1; i < g.n_elementos; i++){
         for(int j = i + 1; j < g.n_elementos; j++){
-            int aux = rt_aux[j];
-            rt_aux[j] = rt_aux[i];
-            rt_aux[i] = aux;
-            if (custo > calculaCusto(g, rt_aux)){
-                custo = calculaCusto(g, rt_aux);
-                copiaArray(rt_swap, rt_aux, g.n_elementos);
+            int custo_aux = custo_inicial - g.elementos[rota[i-1]][rota[i]] - g.elementos[rota[i]][rota[i+1]]
+                                          - g.elementos[rota[j-1]][rota[j]] - g.elementos[rota[j]][rota[j+1]]
+                                          + g.elementos[rota[i-1]][rota[j]] + g.elementos[rota[j]][rota[i+1]]
+                                          + g.elementos[rota[j-1]][rota[i]] + g.elementos[rota[i]][rota[j+1]];
+            if (custo_aux < menor_custo){
+                menor_custo = custo_aux;
+                indice1 = i;
+                indice2 = j;
+
             }
-        }
+         }
     }
+    if (indice1 != -1){ //encontrou uma rota mais curta, entao faz a troca de elementos que equivale ao menor custo
+        int aux = rt_swap[indice2];
+        rt_swap[indice2] = rt_swap[indice1];
+        rt_swap[indice1] = aux;
+    } else {
+        rt_swap = rota; //se nao encontrou uma rota melhor, salva a rota original na varivel do retorno da funcao
+    }
+
     return rt_swap;
 }
 
-int *VND(grafo g, int *rota){
+vector<int> VND(grafo g, vector<int> rota){
     int n_estruturas = 2, estrutura = 1;
-    int *rt_vnd = new int[g.n_elementos + 1];
-    copiaArray(rt_vnd, rota, g.n_elementos);
-
+    vector<int> rt_vnd;
     while(estrutura <= n_estruturas){
         rt_vnd = (estrutura == 1 ? opt2(g, rota):swap(g, rota));
-        if(calculaCusto(g, rota) > calculaCusto(g, rt_vnd)){
-            copiaArray(rota, rt_vnd, g.n_elementos);
+        if(calculaCusto(g, rt_vnd) < calculaCusto(g, rota)){
+            rota = rt_vnd;
             estrutura = 1;
         } else {
             estrutura++;
         }
     }
-    printRota(g, rota);
-    int a = calculaCusto(g, rota);
-    cout << "custo: " << " ";
-    cout << a << endl;
     return rota;
 }
 
-/*int *GRASP(grafo g, int grasp_max, int *rota){
-    custo = INFINITO;
-    for(int interacao = 0; interacao < grasp_max; interacao++){
-        int *rt_grasp = new int[g.n_elementos + 1];
-        rt_grasp = VND(g, construcao(g, alpha, rota));
-        if (custo > calculaCusto(g, rt_grasp){
-            copiaArray(rota, rt_grasp, g.n_elementos);
+void GRASP(grafo g, int grasp_max){
+    int custo = INFINITO;
+    vector<int> solucao;
+    for(int i = 0; i < grasp_max; i++){
+        vector<int> rt_grasp;
+        rt_grasp = construcao(g, 0.5);
+        rt_grasp = VND(g, rt_grasp);
+        if (custo > calculaCusto(g, rt_grasp)){
             custo = calculaCusto(g, rt_grasp);
+            solucao = rt_grasp;
         }
     }
-    copiaArray(rt)
-    return rota;
-}*/
-
-static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2){
-    for(int a = 0; a < lim1; a++) rt_aux[a] = rota[a];
-    for(int a = lim1, b = 0; a <= lim2; a++, b++)  rt_aux[a] = rota[lim2 - b];
-    for(int a = lim2 + 1; a < n_elementos; a++) rt_aux[a] = rota[a];
+    printRota(g, solucao);
+    cout << "custo da solucao: ";
+    cout << custo << endl;
 }
 
-vector<int> construcao(grafo g, int alpha){
-    vector<int> rota;
-    srand (time(NULL));
-    int n_inicial = rand() % g.n_elementos;
-    rota.push_back((int)(n_inicial));
+static vector<int> flip(grafo g, vector<int> rota, vector<int> rt_opt, int lim1, int lim2){
+    for(int a = 0; a < lim1; a++) rt_opt.push_back(rota[a]);
+    for(int a = lim1, b = 0; a <= lim2; a++, b++)  rt_opt.push_back(rota[lim2 - b]);
+    for(int a = lim2 + 1; a <= g.n_elementos; a++) rt_opt.push_back(rota[a]);
+    return rt_opt;
+}
 
-    vector<elemento> LC;
-    for(int j = 0; j < g.n_elementos; j++){ //inicializa a lc para o vertice inicial
-        if (j != n_inicial) LC.push_back(iniciaElemento(g, rota[rota.size() - 1], j));
+static vector<int> construcao(grafo g, float alpha){
+    vector<int> rota;   //define a solucao a ser construida
+    srand (time(NULL)); //para que a cada compilação, novos valores aleatorios sejam gerados
+    int n_inicial = rand() % g.n_elementos; //seleciona uma origem aleatoriamente
+    rota.push_back((int)(n_inicial)); //adiciona a origem a rota
+
+    vector<elemento> LC;    //define a lista de candidatos
+    for(int j = 0; j < g.n_elementos; j++){ //inicializa a lista de candidatos para o vertice inicial
+        if (j != n_inicial) LC.push_back(iniciaElemento(g, n_inicial, j));
     }
 
-    while (LC.size() != 0){
-        int *minimo, *maximo;
-        custoMaxMin(LC, minimo, maximo);
-        int restricao = *minimo - alpha * (*maximo - *minimo);
-        vector<int> LCR;
+    sort(LC.begin(), LC.end(), ordenaVector);  //ordena a lista de candidatos
+
+    while (LC.size() != 0){ //enquanto a lista de candidatos não for vazia
+        int minimo = LC[0].custo;   //como a lc esta ordenada o custo minimo será o primeiro elemento da lista
+        int maximo = LC[LC.size() - 1].custo; //assim como o valor maximo será o ultimo elemento
+        int restricao = minimo + alpha*(maximo - minimo); //calculo do valor da restricao
+
+        vector<int> LCR; //define a lista de candidatos restritos
+        /*for(int i = 0; LC[i].custo <= restricao; i++){ //IMPORTANTE, ERRO NAO COMPREENDIDO NA ULTIMA INTERACAO
+            LCR.push_back(LC[i].id);
+        }*/
+
         for(int i = 0; i < LC.size(); i++){
-            if (LC[i].custo <= restricao)   LCR.push_back(LC[i].id);
+            if(LC[i].custo <= restricao) LCR.push_back(LC[i].id); //adiciona a lrc todos os elementos da lc que respeitam a restricao
         }
-        rota.push_back(LCR[rand() % LCR.size()]);
+
+      	int indice_n =  rand() % LCR.size();  //seleciona aleatoriamente um elemento de lcr para adicionar a solucao
+        rota.push_back(LCR[indice_n]);  //adiciona o elemento a solucao
+        LCR.clear(); //limpa a lista de candidatos restrito
+
+      	for(int i = 0; i < LC.size(); i++){
+            LC[i].custo = g.elementos[LC[indice_n].id][LC[i].id];   //atualiza os custo dos elementos da lista de candidatos
+        }
+
+        LC.erase(LC.begin()+indice_n);  // exclui da lista de candidatos o elemento já adicionado a rota
+        sort(LC.begin(), LC.end(), ordenaVector);  //ordena a lista atualizada
     }
 
     rota.push_back(rota[0]); //adiciona o primeiro elemento ao final para fechar o ciclo hamiltoniano
     return rota;
-/*    int origem = rand()%(g.n_elementos - 1);
-
-    int max = 0, min = INFINITO, LCR_tam=0, s, sol;
-    int LCR_vector[g.n_elementos];
-    int *rt_aux = new int[g.n_elementos + 1];
-    for (int u = 0; u < g.n_elementos; u++){
-        if(g.elementos[origem][u] != 0) rt_aux[u] = g.elementos[origem][u];
-    }
-    for (int i = 0; i < g.n_elementos; i++){
-        for(int u = 0; u <g.n_elementos; u++){
-            if (rt_aux[u] > max) max = rt_aux[u];
-            if (rt_aux[u] < min) min = rt_aux[u];
-        }
-        int LCR = min + alpha*(max-min);
-        for(int i=0; i<g.n_elementos; i++){
-            if(re_aux[i]<= LCR){
-                LCR_vector[LCR_tam] = re_aux[i];
-                LCR_tam++;
-        }
-        srand(time(0));
-        s = rand()%(LCR_tam-1);
-        sol = LCR_vector[s];
-    }
-    return sol;
-}*/
 }
 
 static elemento iniciaElemento(grafo g, int linha, int coluna){
@@ -216,39 +182,32 @@ static elemento iniciaElemento(grafo g, int linha, int coluna){
     return elem;
 }
 
-static void copiaArray(int *destino, int *origem, int n_elementos){
-    for (int u = 0; u <= n_elementos; u++)  destino[u] = origem[u];
+static bool ordenaVector (elemento elem1, elemento elem2){
+    return (elem1.custo < elem2.custo);
 }
 
-int calculaCusto(grafo g, int *rota){
+int calculaCusto(grafo g, vector<int> rota){
     int custo = 0;
     for (int u = 0; u < g.n_elementos; u++) custo += g.elementos[rota[u]][rota[u + 1]];
     return custo;
 }
 
-int calculaNInicial(grafo g, int *rota){
+int calculaNInicial(grafo g){
     int n_inicial;
-    int custo_min = INFINITO;
+    int menor_custo = INFINITO;
+    vector<int> rota;
     for(int u = 0; u < g.n_elementos; u++){
-        HVMP(g, rota, u);
+        rota = HVMP(g, u);
         int custo = calculaCusto(g, rota);
-        cout << "n_inicial:" << " ";
-        cout << u << endl;
-        cout << "custo:" << " ";
-        cout << custo << endl;
-        if (custo_min > custo){
-            custo_min = custo;
+        if (menor_custo > custo){
+            menor_custo = custo;
             n_inicial = u;
         }
     }
-    cout << "custo minimo:" << " ";
-    cout << custo_min << endl;
-    cout << "n_inicial_final:" << " ";
-    cout << n_inicial << endl;
     return n_inicial;
 }
 
-void printMatriz(grafo g){
+void printMatriz(grafo g){  //para testes
     cout << "Matriz de adjacencias: " << endl;
     for(int i = 0; i < g.n_elementos; i++){
         for(int j = 0; j < g.n_elementos; j++) cout << g.elementos[i][j] << " ";
@@ -256,8 +215,8 @@ void printMatriz(grafo g){
     }
 }
 
-void printRota(grafo g, int *rota){
+void printRota(grafo g, vector<int> rota){
     cout << "Rota: " << endl;
-    for(int u = 0; u <= g.n_elementos; u++) cout << rota[u] << " ";
+    for(int u = 0; u < rota.size(); u++) cout << rota[u] << " ";
     cout << endl;
 }
