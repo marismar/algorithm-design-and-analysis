@@ -22,24 +22,22 @@ typedef struct elemento{
     int id;
 };
 
-
 /*------ FUNCOES ESSENCIAIS ------*/
 void iniciaGrafo(grafo *g, ifstream &instancia);
-void HVMP(grafo g, int *rota, int n_inicial);
-int *opt2(grafo g, int *rota);
-int *swap(grafo g, int *rota);
-int *VND(grafo g, int *rota);
-int *GRASP(grafo g, int grasp_max, int *rota);
-static vector<int> construcao(grafo g, int alpha);
+vector<int> HVMP(grafo g, int n_inicial);
+vector<int> opt2(grafo g, vector<int> rota);
+vector<int> swap(grafo g, vector<int> rota);
+vector<int> VND(grafo g, vector<int> rota);
+void GRASP(grafo g, int grasp_max);
+static vector<int> construcao(grafo g, float alpha);
 
 /*------ FUNCOES AUXILIARES ------*/
-static void flip(int n_elementos, int *rota, int *rt_aux, int lim1, int lim2);
+static vector<int> flip(grafo g, vector<int> rota, vector<int> rt_opt, int lim1, int lim2);
 static elemento iniciaElemento(grafo g, int linha, int coluna);
-static custoMaxMin(vector<elemento> LC, int *minimo, int *maximo);
-static void copiaArray(int *destino, int *origem, int n_elementos);
-int calculaCusto(grafo g, int *rota);
-int calculaNInicial(grafo g, int *rota);
+static bool ordenaVector (elemento elem1, elemento elem2);
+int calculaCusto(grafo g, vector<int> rota);
+int calculaNInicial(grafo g);
 void printMatriz(grafo g);
-void printRota(grafo g, int *rota);
+void printRota(grafo g, vector<int> rota);
 
 #endif // TSP_H_INCLUDED
