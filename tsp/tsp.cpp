@@ -23,7 +23,7 @@ vector<int> HVMP(grafo g, int n_inicial){    //Heuristica de construção do viz
     rota.push_back((int)(n_inicial));   //adiciona o elemento inicial a lista
     elem_adicionados[n_inicial] = true; //muda o valor do elemento inicial para true
 
-    for(int i = 0; i < g.n_elementos; i++){
+    for(int i = 0; i < g.n_elementos - 1; i++){
         int distancia_min = INFINITO;   //define a distancia minima como infinita
         int n_proximo = -1; //proximo elemento a ser adicionado a lista recebe valor nulo
         for(int j = 0; j < g.n_elementos; j++){
@@ -41,7 +41,6 @@ vector<int> HVMP(grafo g, int n_inicial){    //Heuristica de construção do viz
 
 vector<int> opt2(grafo g, vector<int> rota){
     int custo_inicial = calculaCusto(g, rota);    //salva o custo da solucao inicial
-
     vector<int> rt_opt; //define a rota que a funcao ira retornar
     int lim1 = -1, lim2 = -1;   //valores de indice nulos
     int menor_custo = custo_inicial; //menor custo inicializado com um valor muito grande
@@ -78,7 +77,6 @@ vector<int> swap(grafo g, vector<int> rota){
                 menor_custo = custo_aux;
                 indice1 = i;
                 indice2 = j;
-
             }
          }
     }
@@ -86,18 +84,46 @@ vector<int> swap(grafo g, vector<int> rota){
         int aux = rt_swap[indice2];
         rt_swap[indice2] = rt_swap[indice1];
         rt_swap[indice1] = aux;
-    } else {
-        rt_swap = rota; //se nao encontrou uma rota melhor, salva a rota original na varivel do retorno da funcao
     }
 
     return rt_swap;
 }
 
+vector<int> reInsertion(grafo g, vector<int> rota){
+    int custo_inicial = calculaCusto(g, rota);
+    vector<int> rt_rit;
+    rt_rit = rota;
+    int indice1 = -1, indice2 = -1; //valores de indice nulos
+    int menor_custo = INFINITO; //menor custo inicializado com um valor muito grande
+    for(int i = 1; i < g.n_elementos; i++){
+        for(int j = i + 1; j < g.n_elementos; j++){
+            int custo_aux = custo_inicial - g.elementos[rota[i-1]][rota[i]] - g.elementos[rota[i]][rota[i+1]] - g.elementos[rota[j]][rota[j+1]]
+                                          + g.elementos[rota[i-1]][rota[i+1]] + g.elementos[rota[j]][rota[i]] + g.elementos[rota[i]][rota[j+1]];
+            if (custo_aux < menor_custo){
+                menor_custo = custo_aux;
+                indice1 = i;
+                indice2 = j;
+            }
+         }
+    }
+    if (indice1 != -1){
+        rt_rit.erase(rt_rit.begin()+indice1);
+        rt_rit.insert(rt_rit.begin()+indice2, rota[indice1]);
+    }
+
+    return rt_rit;
+}
+
 vector<int> VND(grafo g, vector<int> rota){
-    int n_estruturas = 2, estrutura = 1;
+    //int n_estruturas = 2, estrutura = 1;
+    int n_estruturas = 3, estrutura = 1;
     vector<int> rt_vnd;
     while(estrutura <= n_estruturas){
-        rt_vnd = (estrutura == 1 ? opt2(g, rota):swap(g, rota));
+        //rt_vnd = (estrutura == 1 ? opt2(g, rota):swap(g, rota));
+        if(estrutura == 1) rt_vnd = opt2(g, rota);
+        else if(estrutura == 2) rt_vnd = swap(g, rota);
+        else rt_vnd = reInsertion(g, rota);
+
         if(calculaCusto(g, rt_vnd) < calculaCusto(g, rota)){
             rota = rt_vnd;
             estrutura = 1;
@@ -113,15 +139,16 @@ void GRASP(grafo g, int grasp_max){
     vector<int> solucao;
     for(int i = 0; i < grasp_max; i++){
         vector<int> rt_grasp;
-        rt_grasp = construcao(g, 0.5);
+        rt_grasp = construcao(g, 0.2);
         rt_grasp = VND(g, rt_grasp);
         if (custo > calculaCusto(g, rt_grasp)){
             custo = calculaCusto(g, rt_grasp);
             solucao = rt_grasp;
+
         }
     }
     printRota(g, solucao);
-    cout << "custo da solucao: ";
+    cout << "custo da solucao final: ";
     cout << custo << endl;
 }
 
@@ -151,9 +178,6 @@ static vector<int> construcao(grafo g, float alpha){
         int restricao = minimo + alpha*(maximo - minimo); //calculo do valor da restricao
 
         vector<int> LCR; //define a lista de candidatos restritos
-        /*for(int i = 0; LC[i].custo <= restricao; i++){ //IMPORTANTE, ERRO NAO COMPREENDIDO NA ULTIMA INTERACAO
-            LCR.push_back(LC[i].id);
-        }*/
 
         for(int i = 0; i < LC.size(); i++){
             if(LC[i].custo <= restricao) LCR.push_back(LC[i].id); //adiciona a lrc todos os elementos da lc que respeitam a restricao
@@ -207,7 +231,7 @@ int calculaNInicial(grafo g){
     return n_inicial;
 }
 
-void printMatriz(grafo g){  //para testes
+void printMatriz(grafo g){
     cout << "Matriz de adjacencias: " << endl;
     for(int i = 0; i < g.n_elementos; i++){
         for(int j = 0; j < g.n_elementos; j++) cout << g.elementos[i][j] << " ";
