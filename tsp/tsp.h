@@ -27,6 +27,7 @@ void iniciaGrafo(grafo *g, ifstream &instancia);
 vector<int> HVMP(grafo g, int n_inicial);
 vector<int> opt2(grafo g, vector<int> rota);
 vector<int> swap(grafo g, vector<int> rota);
+vector<int> reInsertion(grafo g, vector<int> rota);
 vector<int> VND(grafo g, vector<int> rota);
 void GRASP(grafo g, int grasp_max);
 static vector<int> construcao(grafo g, float alpha);
