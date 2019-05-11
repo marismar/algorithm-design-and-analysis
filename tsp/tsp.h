@@ -7,6 +7,7 @@
 #include <time.h>
 #include <vector>
 #include <algorithm>
+#include <math.h>
 
 #define INFINITO 9999999
 
@@ -33,7 +34,7 @@ void GRASP(grafo g, int grasp_max);
 static vector<int> construcao(grafo g, float alpha);
 
 /*------ FUNCOES AUXILIARES ------*/
-static vector<int> flip(grafo g, vector<int> rota, vector<int> rt_opt, int lim1, int lim2);
+static vector<int> flip(grafo g, vector<int> rota, int lim1, int lim2);
 static elemento iniciaElemento(grafo g, int linha, int coluna);
 static bool ordenaVector (elemento elem1, elemento elem2);
 int calculaCusto(grafo g, vector<int> rota);
