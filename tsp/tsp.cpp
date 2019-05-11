@@ -1,18 +1,54 @@
 #include "tsp.h"
 
 void iniciaGrafo(grafo *g, ifstream &instancia){
-    instancia >> g->n_elementos;
-
+    instancia >> g->n_elementos;    //Lê o número de vértices do grafo
     g->elementos = new int*[g->n_elementos];
-    for (int u = 0; u < g->n_elementos; u++) g->elementos[u] = new int[g->n_elementos];
+    for (int u = 0; u < g->n_elementos; u++) g->elementos[u] = new int[g->n_elementos]; //Declaração da matriz de adjacências
 
-    string valor;
+/**  ------------------------ INSTANCIAS TESTES (INICIO) ---------------------------------------------------------------    **/
+/*    string valor;
     for(int i = 0; i < g->n_elementos; i++){
         for(int j = 0; j < g->n_elementos; j++){
             instancia >> valor;
             g->elementos[i][j] = atoi(valor.c_str());
         }
     }
+*/
+/**  ------------------------ INSTANCIAS TESTES (FIM) ------------------------------------------------------------------    **/
+
+
+/**  ------------------------ INSTANCIAS TSP-CUP (INICIO) --------------------------------------------------------------    **/
+    ifstream instancia2;    //Para leitura do arquivo auxiliar
+    string valor, elem; //String para salvar os dados lidos
+    double x1, x2, y1, y2, distancia, diferenca;
+    int dist_int;
+
+    for(int i = 0; i < g->n_elementos; i++){
+        instancia >> elem;  //informação ignorada
+        instancia >> valor;  //Lê a coordenada x do primeiro ponto
+        x1 = stod(valor.c_str());  //Salva o valor em x1
+        instancia >> valor;    //Lê a coordenada y do primeiro ponto
+        y1 = stod(valor.c_str());  //Salva o valor em y1
+
+        instancia2.open("instancias/instancias_tsp_cup/tsp1-aux.txt", ios::in); //Abre o arquivo auxiliar
+        for(int j = 0; j < g->n_elementos; j++){
+            instancia2 >> elem; //ignorado
+            instancia2 >> valor;    //lê a coordenada x do segundo ponto
+            x2 = stod(valor.c_str());   //salva o valor em x2
+            instancia2 >> valor;    //lê a coordenada y do segundo ponto
+            y2 = stod(valor.c_str());   //salva o valor em y2
+
+            distancia = sqrt(((x2 - x1)*(x2 - x1)) + ((y2 - y1)*(y2 - y1)));    //Calculo da distancia euclidiana
+            dist_int = distancia; //dist_int recebe o numero inteiro de distancia - Ex: distancia = 654.854/dist_int = 654
+            diferenca = distancia - dist_int; //Calcula a diferença entre o numero real e o número inteiro
+
+            g->elementos[i][j] = ((diferenca >= 0.5) ? dist_int + 1 : dist_int);//Se a diferença entre o número real e o inteiro for 0.5 ou maior, distancia final será dist_int + 1
+
+        }
+        instancia2.close(); //Fecha o arquivo auxiliar
+    }
+/**  ------------------------ INSTANCIAS TSP-CUP (FIM) -----------------------------------------------------------------    **/
+
 }
 
 vector<int> HVMP(grafo g, int n_inicial){    //Heuristica de construção do vizinho mais proximo
@@ -41,14 +77,13 @@ vector<int> HVMP(grafo g, int n_inicial){    //Heuristica de construção do viz
 
 vector<int> opt2(grafo g, vector<int> rota){
     int custo_inicial = calculaCusto(g, rota);    //salva o custo da solucao inicial
-    vector<int> rt_opt; //define a rota que a funcao ira retornar
     int lim1 = -1, lim2 = -1;   //valores de indice nulos
     int menor_custo = custo_inicial; //menor custo inicializado com um valor muito grande
     for(int i = 1; i < g.n_elementos; i++){
         for(int j = i + 1; j < g.n_elementos; j++){
             int custo_aux = custo_inicial - g.elementos[rota[i-1]][rota[i]] - g.elementos[rota[j]][rota[j+1]]
-                                          + g.elementos[rota[i-1]][rota[j]] + g.elementos[rota[i]][rota[j+1]];
-            if (custo_aux < menor_custo){
+                                          + g.elementos[rota[i-1]][rota[j]] + g.elementos[rota[i]][rota[j+1]]; //Calcula o custo da nova rota
+            if (custo_aux < menor_custo){   //atualiza o menor custo e salva os indices
                 menor_custo = custo_aux;
                 lim1 = i;
                 lim2 = j;
@@ -56,15 +91,11 @@ vector<int> opt2(grafo g, vector<int> rota){
         }
     }
 
-    if(lim1 == -1)  rt_opt = rota; //se nao encontrar nenhuma rota mais curta, rt_opt recebe a rota original
-    else rt_opt = flip(g, rota, rt_opt, lim1, lim2); //salva a rota mais curta em rt_opt
-    return rt_opt; //rota aprimorada, com o custo menor que a rota inicial
+    return ((lim1 != -1) ? flip(g, rota, lim1, lim2) : rota);   //retorna a rota mais curta
 }
 
 vector<int> swap(grafo g, vector<int> rota){
     int custo_inicial = calculaCusto(g, rota);
-    vector<int> rt_swap;
-    rt_swap = rota;
     int indice1 = -1, indice2 = -1; //valores de indice nulos
     int menor_custo = INFINITO; //menor custo inicializado com um valor muito grande
     for(int i = 1; i < g.n_elementos; i++){
@@ -72,27 +103,24 @@ vector<int> swap(grafo g, vector<int> rota){
             int custo_aux = custo_inicial - g.elementos[rota[i-1]][rota[i]] - g.elementos[rota[i]][rota[i+1]]
                                           - g.elementos[rota[j-1]][rota[j]] - g.elementos[rota[j]][rota[j+1]]
                                           + g.elementos[rota[i-1]][rota[j]] + g.elementos[rota[j]][rota[i+1]]
-                                          + g.elementos[rota[j-1]][rota[i]] + g.elementos[rota[i]][rota[j+1]];
+                                          + g.elementos[rota[j-1]][rota[i]] + g.elementos[rota[i]][rota[j+1]];  //Calcula o custo da nova rota
             if (custo_aux < menor_custo){
-                menor_custo = custo_aux;
+                menor_custo = custo_aux;    //salva o menor custo e os indices para o swap
                 indice1 = i;
                 indice2 = j;
             }
          }
     }
     if (indice1 != -1){ //encontrou uma rota mais curta, entao faz a troca de elementos que equivale ao menor custo
-        int aux = rt_swap[indice2];
-        rt_swap[indice2] = rt_swap[indice1];
-        rt_swap[indice1] = aux;
+        int aux = rota[indice2];
+        rota[indice2] = rota[indice1];
+        rota[indice1] = aux;
     }
-
-    return rt_swap;
+    return rota;
 }
 
 vector<int> reInsertion(grafo g, vector<int> rota){
     int custo_inicial = calculaCusto(g, rota);
-    vector<int> rt_rit;
-    rt_rit = rota;
     int indice1 = -1, indice2 = -1; //valores de indice nulos
     int menor_custo = INFINITO; //menor custo inicializado com um valor muito grande
     for(int i = 1; i < g.n_elementos; i++){
@@ -107,19 +135,18 @@ vector<int> reInsertion(grafo g, vector<int> rota){
          }
     }
     if (indice1 != -1){
-        rt_rit.erase(rt_rit.begin()+indice1);
-        rt_rit.insert(rt_rit.begin()+indice2, rota[indice1]);
+        int elemento = rota[indice1];
+        rota.erase(rota.begin()+indice1);
+        rota.insert(rota.begin()+indice2, elemento);
     }
 
-    return rt_rit;
+    return rota;
 }
 
 vector<int> VND(grafo g, vector<int> rota){
-    //int n_estruturas = 2, estrutura = 1;
     int n_estruturas = 3, estrutura = 1;
     vector<int> rt_vnd;
     while(estrutura <= n_estruturas){
-        //rt_vnd = (estrutura == 1 ? opt2(g, rota):swap(g, rota));
         if(estrutura == 1) rt_vnd = opt2(g, rota);
         else if(estrutura == 2) rt_vnd = swap(g, rota);
         else rt_vnd = reInsertion(g, rota);
@@ -148,14 +175,17 @@ void GRASP(grafo g, int grasp_max){
         }
     }
     printRota(g, solucao);
-    cout << "custo da solucao final: ";
+    cout << "Custo da Solucao Final: ";
     cout << custo << endl;
 }
 
-static vector<int> flip(grafo g, vector<int> rota, vector<int> rt_opt, int lim1, int lim2){
+static vector<int> flip(grafo g, vector<int> rota, int lim1, int lim2){
+    vector<int> rt_opt; //define a rota que a funcao ira retornar
+
     for(int a = 0; a < lim1; a++) rt_opt.push_back(rota[a]);
     for(int a = lim1, b = 0; a <= lim2; a++, b++)  rt_opt.push_back(rota[lim2 - b]);
     for(int a = lim2 + 1; a <= g.n_elementos; a++) rt_opt.push_back(rota[a]);
+
     return rt_opt;
 }
 
@@ -181,6 +211,7 @@ static vector<int> construcao(grafo g, float alpha){
 
         for(int i = 0; i < LC.size(); i++){
             if(LC[i].custo <= restricao) LCR.push_back(LC[i].id); //adiciona a lrc todos os elementos da lc que respeitam a restricao
+            else break; //quando encontrar o primeiro candidato que não obedece, quebra o laço visto que a lista está ordenada
         }
 
       	int indice_n =  rand() % LCR.size();  //seleciona aleatoriamente um elemento de lcr para adicionar a solucao
@@ -241,6 +272,6 @@ void printMatriz(grafo g){
 
 void printRota(grafo g, vector<int> rota){
     cout << "Rota: " << endl;
-    for(int u = 0; u < rota.size(); u++) cout << rota[u] << " ";
+    for(int u = 0; u < rota.size(); u++) cout << rota[u] << ", ";
     cout << endl;
 }
