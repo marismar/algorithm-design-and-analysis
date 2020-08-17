@@ -1,7 +1,7 @@
 <h1 align="center">Algorithm Design and Analysis</h1>
 
 <h4 align="center">
-  Exercícios de implementação da disciplina de Analise e Projeto de Algoritmos.
+  Implementação de problemas clássicos para a disciplina de Analise e Projeto de Algoritmos.
 </h4>
 
 <p align="center">
