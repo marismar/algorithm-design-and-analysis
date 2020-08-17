@@ -18,15 +18,3 @@
     <img src="https://img.shields.io/badge/linkedin-marismarcosta-blue?logo=linkedin"/>
   </a>
 </p>
-
-## About
-
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
-## License 
-
-Copyright © 2020 [Marismar da Costa Silva](https://github.com/marismarcosta).<br />
-This project is [MIT](https://github.com/marismarcosta/travelling-salesman-problem/blob/master/LICENSE) licensed.
