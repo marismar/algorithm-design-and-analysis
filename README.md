@@ -8,7 +8,7 @@
   <a href="https://github.com/marismarcosta/algorithm-design-and-analysis/blob/master/LICENSE" target="_blank">
     <img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square" />
   </a>
-  <img alt="last commit" src="https://img.shields.io/github/last-commit/marismarcosta/algorithm-design-and-analysis?color=FF6347&style=flat-square"/>
+  <img alt="last commit" src="https://img.shields.io/github/last-commit/marismarcosta/algorithm-design-and-analysis?color=0f0&style=flat-square"/>
   <img alt="repo size" src="https://img.shields.io/github/repo-size/marismarcosta/algorithm-design-and-analysis?color=ffa07a&style=flat-square" />
   <a href="https://github.com/marismarcosta" target="_blank">
     <img src="https://img.shields.io/badge/marismarcosta-8B008B?logo=GitHub&style=flat-square"/>
